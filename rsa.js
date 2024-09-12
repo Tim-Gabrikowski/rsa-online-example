@@ -63,7 +63,7 @@ function isPrime(num) {
 }
 
 // RSA Key Generation
-function generateRSAKeys(bits) {
+function generateRSAKeys(bits = 16) {
 	let start = Date.now();
 	console.log("Generate first Prime");
 	// Generate two random prime numbers p and q
@@ -161,13 +161,50 @@ function returnTimes(sBits = 8, mBits = 16, incr = 1) {
 	return times;
 }
 
-module.exports = {
-	modPow,
-	generateRSAKeys,
-	decrypt,
-	encrypt,
-	main,
-	returnTimes,
-};
+function bigintsToHex(bigints) {
+	return bigints
+		.map((bn) => {
+			let hex = bn.toString(16);
+			let lengthHex = hex.length.toString(16).padStart(4, "0");
+			return lengthHex + hex;
+		})
+		.join("");
+}
+function hexToBigints(hexString) {
+	let bigints = [];
+	let i = 0;
 
-// const {modPow, generateRSAKeys, decrypt, encrypt, main} = require("./rsa.js");
+	while (i < hexString.length) {
+		let lengthHex = hexString.slice(i, i + 4);
+		let length = parseInt(lengthHex, 16);
+		i += 4;
+
+		let bigIntHex = hexString.slice(i, i + length);
+		bigints.push(BigInt("0x" + bigIntHex));
+		i += length;
+	}
+
+	return bigints;
+}
+
+function encryptString(s = "", key, pub = true) {
+	let res = [];
+	let cs = s.split("");
+	for (let i = 0; i < cs.length; i++) {
+		const c = cs[i];
+		if (pub) res.push(encrypt(BigInt(c.charCodeAt(0)), key));
+		else res.push(encrypt(BigInt(c.charCodeAt(0)), { n: key.n, e: key.d }));
+	}
+	return bigintsToHex(res);
+}
+
+function decryptString(s = "", key, pub = false) {
+	let res = [];
+	let bi = hexToBigints(s);
+	for (let i = 0; i < bi.length; i++) {
+		const b = bi[i];
+		if (pub) res.push(decrypt(b, { n: key.n, d: key.e }));
+		else res.push(decrypt(b, key));
+	}
+	return String.fromCharCode(...res.map((b) => Number(b)));
+}

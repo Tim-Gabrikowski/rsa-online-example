@@ -4,22 +4,141 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>RSA-Example</title>
-		<script src="./rsa.js"></script>
+		<link rel="stylesheet" href="./style.css" />
 	</head>
-	<body>
+	<body class="column">
 		<h1>RSA-Example</h1>
-		<div>
+		<div class="container">
 			<h2>Generate Keys</h2>
+			<div class="row">
+				<span>8</span>
+				<input
+					type="range"
+					name="range"
+					id="bitSizeRange"
+					min="8"
+					max="105"
+					value="64"
+					oninput="document.getElementById('rangeOutput').value = this.value"
+				/>
+				<span>105</span>
+			</div>
+			<button id="generateKeyBtn">
+				Generate Keys with <output id="rangeOutput">64</output> Bits
+			</button>
+			<div id="keyBox">
+				<div class="field">
+					<div class="f_key">n</div>
+					<div class="f_value" id="f_n">---</div>
+				</div>
+				<div class="field">
+					<div class="f_key">e</div>
+					<div class="f_value" id="f_e">---</div>
+				</div>
+				<div class="field">
+					<div class="f_key">d</div>
+					<div class="f_value" id="f_d">---</div>
+				</div>
+			</div>
+			<span>Calculation took <span id="f_ms">0</span> milliseconds</span>
 		</div>
-		<div>
+		<div class="container">
 			<h2>Encrypt</h2>
+			<div class="row">
+				<div class="container">
+					<h3>public key</h3>
+					<input type="text" name="" id="pue_i" placeholder="text" />
+					<button id="pue_b">Encrypt</button>
+					<input type="text" name="" id="pue_o" placeholder="cipher" disabled />
+					<button id="pue_c">Copy to Clipboard</button>
+				</div>
+				<div class="container">
+					<h3>private key</h3>
+					<input type="text" name="" id="pre_i" placeholder="text" />
+					<button id="pre_b">Encrypt</button>
+					<input type="text" name="" id="pre_o" placeholder="cipher" disabled />
+					<button id="pre_c">Copy to Clipboard</button>
+				</div>
+			</div>
 		</div>
-		<div>
+		<div class="container">
 			<h2>Decrypt</h2>
+			<div class="row">
+				<div class="container">
+					<h3>private key</h3>
+					<input type="text" name="" id="prd_i" placeholder="cipher" />
+					<button id="prd_b">Decrypt</button>
+					<input type="text" name="" id="prd_o" placeholder="text" disabled />
+				</div>
+				<div class="container">
+					<h3>public key</h3>
+					<input type="text" name="" id="pud_i" placeholder="cipher" />
+					<button id="pud_b">Decrypt</button>
+					<input type="text" name="" id="pud_o" placeholder="text" disabled />
+				</div>
+			</div>
 		</div>
-		<div>
-			<h2>Key generation times</h2>
+		<div class="container">
+			<h2>Disclaimer</h2>
+			<p>
+				The outputted string does not match any official RSA output format. It
+				is encoded in a format created only for the pupose of this
+				demonstration.
+			</p>
 		</div>
 	</body>
-	<script></script>
+	<script src="./rsa.js"></script>
+	<script type="text/javascript">
+		let keys = {};
+
+		document.getElementById("generateKeyBtn").addEventListener("click", () => {
+			genKeys();
+		});
+		function genKeys() {
+			let b = document.getElementById("bitSizeRange").value;
+			let key = generateRSAKeys(b);
+			document.getElementById("f_n").innerText = key.privateKey.n;
+			document.getElementById("f_e").innerText = key.publicKey.e;
+			document.getElementById("f_d").innerText = key.privateKey.d;
+			document.getElementById("f_ms").innerText = key.timeTaken;
+			keys = key;
+		}
+
+		document.getElementById("pue_c").addEventListener("click", () => {
+			navigator.clipboard.writeText(document.getElementById("pue_o").value);
+		});
+		document.getElementById("pre_c").addEventListener("click", () => {
+			navigator.clipboard.writeText(document.getElementById("pre_o").value);
+		});
+
+		document.getElementById("pue_b").addEventListener("click", () => {
+			if (typeof keys.publicKey == "undefined") genKeys();
+
+			let i = document.getElementById("pue_i").value;
+			let o = encryptString(i, keys.publicKey, true);
+			document.getElementById("pue_o").value = o;
+		});
+		document.getElementById("pre_b").addEventListener("click", () => {
+			if (typeof keys.privateKey == "undefined") genKeys();
+
+			let i = document.getElementById("pre_i").value;
+			let o = encryptString(i, keys.privateKey, false);
+			document.getElementById("pre_o").value = o;
+		});
+
+		document.getElementById("pud_b").addEventListener("click", () => {
+			if (typeof keys.publicKey == "undefined") genKeys();
+
+			let i = document.getElementById("pud_i").value;
+			let o = decryptString(i, keys.publicKey, true);
+			document.getElementById("pud_o").value = o;
+		});
+		document.getElementById("prd_b").addEventListener("click", () => {
+			if (typeof keys.privateKey == "undefined") genKeys();
+
+			let i = document.getElementById("prd_i").value;
+			let o = decryptString(i, keys.privateKey, false);
+			document.getElementById("prd_o").value = o;
+		});
+	</script>
 </html>
