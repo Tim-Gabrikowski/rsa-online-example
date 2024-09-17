@@ -165,7 +165,7 @@ function bigintsToHex(bigints) {
 	return bigints
 		.map((bn) => {
 			let hex = bn.toString(16);
-			let lengthHex = hex.length.toString(16).padStart(4, "0");
+			let lengthHex = hex.length.toString(16).padStart(2, "0");
 			return lengthHex + hex;
 		})
 		.join("");
@@ -175,9 +175,9 @@ function hexToBigints(hexString) {
 	let i = 0;
 
 	while (i < hexString.length) {
-		let lengthHex = hexString.slice(i, i + 4);
+		let lengthHex = hexString.slice(i, i + 2);
 		let length = parseInt(lengthHex, 16);
-		i += 4;
+		i += 2;
 
 		let bigIntHex = hexString.slice(i, i + length);
 		bigints.push(BigInt("0x" + bigIntHex));

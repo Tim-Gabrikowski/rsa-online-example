@@ -97,11 +97,28 @@
 		function genKeys() {
 			let b = document.getElementById("bitSizeRange").value;
 			let key = generateRSAKeys(b);
-			document.getElementById("f_n").innerText = key.privateKey.n;
-			document.getElementById("f_e").innerText = key.publicKey.e;
-			document.getElementById("f_d").innerText = key.privateKey.d;
-			document.getElementById("f_ms").innerText = key.timeTaken;
 			keys = key;
+			keyDisplay();
+		}
+
+		function keyDisplay() {
+			document.getElementById("f_n").innerText = keys.privateKey.n;
+			document.getElementById("f_e").innerText = keys.publicKey.e;
+			document.getElementById("f_d").innerText = keys.privateKey.d;
+			document.getElementById("f_ms").innerText = keys.timeTaken;
+		}
+
+		function setKeys(n, d, e) {
+			keys = {
+				privateKey: {
+					n: BigInt(n),
+					d: BigInt(d),
+				},
+				publicKey: {
+					n: BigInt(n),
+					e: BigInt(e),
+				},
+			};
 		}
 
 		document.getElementById("pue_c").addEventListener("click", () => {
